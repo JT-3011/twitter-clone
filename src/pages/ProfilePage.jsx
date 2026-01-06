@@ -1,38 +1,25 @@
-import { Navbar, Container, Button } from "react-bootstrap";
+import { getAuth } from "firebase/auth";
+import { useContext } from "react";
+import { Container, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import useLocalStorage from "use-local-storage";   
-
+import { AuthContext } from "../components/AuthProvider";
+import ProfileMidBody from "../components/ProfileMidBody";
+import ProfileSideBar from "../components/ProfileSideBar";
 
 export default function ProfilePage() {
-    const [authToken, setAuthToken] = useLocalStorage("authToken", "");
+    const auth = getAuth();
     const navigate = useNavigate();
+    const { currentUser } = useContext(AuthContext);
 
-    useEffect(() => {
-        if (!authToken) {
-            navigate("/login");
-        }
-    }, [authToken, navigate]);
-
-    const handleLogout = () => {
-        setAuthToken("");  
-    };
-
+    if (!currentUser) navigate("/login");
+    const handleLogout = () => auth.signOut();
     return (
         <>
-            <Navbar bg="light">
-                <Container>
-                    <Navbar.Brand href="/">
-                        <i className="bi bi-twitter" style={{ fontSize: 30, color: "dodgerblue" }}></i>
-
-                    </Navbar.Brand>
-                    <Navbar.Collapse className="justify-content-end">
-                        <Button variant="primary" onClick={handleLogout}>Logout</Button>
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
-            <Container className="mt-3">
-                <h2>Your profile</h2>
+            <Container>
+                <Row>
+                    <ProfileSideBar handleLogout={handleLogout} />
+                    <ProfileMidBody />
+                </Row>
             </Container>
         </>
     );
